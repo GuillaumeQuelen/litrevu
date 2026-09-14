@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Abonnements{% endblock %}
+
+{% block content %}
+    <h1>Abonnements</h1>
+
+    {% if message %}
+        <p class="message" role="status">{{ message }}</p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Suivre</button>
+    </form>
+
+    <h2>Vous suivez</h2>
+    <ul>
+        {% for follow in following %}
+            <li>
+                {{ follow.followed_user.username }}
+                <a href="{% url 'unfollow_user' follow.id %}">Se désabonner</a>
+            </li>
+        {% empty %}
+            <li>Vous ne suivez personne.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Vos abonnés</h2>
+    <ul>
+        {% for follow in followers %}
+            <li>{{ follow.user.username }}</li>
+        {% empty %}
+            <li>Personne ne vous suit.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

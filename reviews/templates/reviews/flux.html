@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Flux{% endblock %}
+
+{% block content %}
+    <h1>Mon flux</h1>
+
+    {% for item in Flux %}
+        <article class="post">
+            {% if item.rating %}
+                <span class="post-type">Critique</span>
+                <p class="post-meta">
+                    Par {{ item.user.username }}, le {{ item.time_created|date:"d/m/Y à H:i" }}
+                </p>
+                <h2>{{ item.headline }}</h2>
+                <p>Note : {{ item.rating }}/5</p>
+                {% if item.body %}
+                    <p>{{ item.body }}</p>
+                {% endif %}
+                {% if item.ticket %}
+                    <p class="post-meta">En réponse à : {{ item.ticket.title }}</p>
+                {% endif %}
+
+                {% if item.user == user %}
+                    <div class="post-actions">
+                        <a href="{% url 'update_review' item.id %}">Modifier</a>
+                        <a href="{% url 'delete_review' item.id %}">Supprimer</a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <span class="post-type">Demande</span>
+                <p class="post-meta">
+                    Par {{ item.user.username }}, le {{ item.time_created|date:"d/m/Y à H:i" }}
+                </p>
+                <h2>{{ item.title }}</h2>
+                {% if item.description %}
+                    <p>{{ item.description }}</p>
+                {% endif %}
+                {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="Couverture de {{ item.title }}" width="150">
+                {% endif %}
+
+                <div class="post-actions">
+                    <a href="{% url 'create_review' item.id %}">Critiquer</a>
+                    {% if item.user == user %}
+                        <a href="{% url 'update_ticket' item.id %}">Modifier</a>
+                        <a href="{% url 'delete_ticket' item.id %}">Supprimer</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </article>
+    {% empty %}
+        <p>Votre flux est vide. Suivez des utilisateurs ou publiez quelque chose.</p>
+    {% endfor %}
+{% endblock %}

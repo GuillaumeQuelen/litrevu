@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LITRevu{% endblock %} — LITRevu</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <a href="{% url 'flux' %}" class="logo">LITRevu</a>
+
+        <nav aria-label="Navigation principale">
+            {% if user.is_authenticated %}
+                <ul>
+                    <li><a href="{% url 'flux' %}">Flux</a></li>
+                    <li><a href="{% url 'my_posts' %}">Mes posts</a></li>
+                    <li><a href="{% url 'follow_users' %}">Abonnements</a></li>
+                    <li><a href="{% url 'create_ticket' %}">Demander une critique</a></li>
+                    <li><a href="{% url 'create_ticket_and_review' %}">Publier une critique</a></li>
+                </ul>
+
+                <div class="user-menu">
+                    <span>{{ user.username }}</span>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">Déconnexion</button>
+                    </form>
+                </div>
+            {% else %}
+                <ul>
+                    <li><a href="{% url 'login' %}">Connexion</a></li>
+                    <li><a href="{% url 'signup' %}">Inscription</a></li>
+                </ul>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

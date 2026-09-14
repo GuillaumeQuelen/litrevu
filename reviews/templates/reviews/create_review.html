@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Critiquer{% endblock %}
+
+{% block content %}
+    <h1>Critiquer : {{ ticket.title }}</h1>
+
+    <p>{{ ticket.description }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Publier la critique</button>
+    </form>
+{% endblock %}
