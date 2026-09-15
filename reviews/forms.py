@@ -2,10 +2,12 @@ from django import forms
 from .models import Ticket, Review
 from django.contrib.auth import get_user_model
 
+
 class TicketForm(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = ['title', 'description', 'image']
+
 
 class ReviewForm(forms.ModelForm):
     rating = forms.ChoiceField(
@@ -18,7 +20,9 @@ class ReviewForm(forms.ModelForm):
         model = Review
         fields = ['headline', 'rating', 'body']
 
+
 User = get_user_model()
+
 
 class FollowUserForm(forms.Form):
     username = forms.CharField(max_length=150, label='Nom d\'utilisateur')

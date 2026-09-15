@@ -3,8 +3,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from .forms import SignupForm
 
+
 def login_page(request):
     return redirect('home')
+
 
 def signup_page(request):
     form = SignupForm()
@@ -18,11 +20,13 @@ def signup_page(request):
 
     return render(request, 'authentication/signup.html', {'form': form})
 
+
 def logout_user(request):
     if request.method == 'POST':
         logout(request)
         return redirect('login')
     return redirect('flux')
+
 
 def home_page(request):
     if request.user.is_authenticated:

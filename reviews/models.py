@@ -27,6 +27,7 @@ class Review(models.Model):
     def __str__(self):
         return self.headline
 
+
 class UserFollows(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='following'
@@ -40,6 +41,7 @@ class UserFollows(models.Model):
 
     def __str__(self):
         return f'{self.user} suit {self.followed_user}'
+
 
 class UserBlocks(models.Model):
     user = models.ForeignKey(

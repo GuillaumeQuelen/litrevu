@@ -223,7 +223,7 @@ def follow_users(request):
     following = UserFollows.objects.filter(user=request.user)
     followers = UserFollows.objects.filter(followed_user=request.user)
     blocks = UserBlocks.objects.filter(user=request.user)
-    
+
     return render(request, 'reviews/follow_users.html', {
         'form': form,
         'message': message,
@@ -231,6 +231,7 @@ def follow_users(request):
         'followers': followers,
         'blocks': blocks,
     })
+
 
 @login_required
 def unfollow_user(request, follow_id):
@@ -244,6 +245,7 @@ def unfollow_user(request, follow_id):
         return redirect('follow_users')
 
     return render(request, 'reviews/unfollow_user.html', {'follow': follow})
+
 
 @login_required
 def block_user(request, user_id):
@@ -266,6 +268,7 @@ def block_user(request, user_id):
         return redirect('follow_users')
 
     return render(request, 'reviews/block_user.html', {'user_to_block': user_to_block})
+
 
 @login_required
 def unblock_user(request, block_id):
