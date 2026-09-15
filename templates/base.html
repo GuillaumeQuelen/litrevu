@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}LITRevu{% endblock %} — LITRevu</title>
+    <title>{% block title %}Accueil{% endblock %} — LITRevu</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <header>
-        <a href="{% url 'flux' %}" class="logo">LITRevu</a>
+        <a href="{% url 'home' %}" class="logo">LITRevu</a>
 
-        <nav aria-label="Navigation principale">
-            {% if user.is_authenticated %}
+        {% if user.is_authenticated %}
+            <nav aria-label="Navigation principale">
                 <ul>
                     <li><a href="{% url 'flux' %}">Flux</a></li>
                     <li><a href="{% url 'my_posts' %}">Mes posts</a></li>
@@ -28,13 +28,8 @@
                         <button type="submit">Déconnexion</button>
                     </form>
                 </div>
-            {% else %}
-                <ul>
-                    <li><a href="{% url 'login' %}">Connexion</a></li>
-                    <li><a href="{% url 'signup' %}">Inscription</a></li>
-                </ul>
-            {% endif %}
-        </nav>
+            </nav>
+        {% endif %}
     </header>
 
     <main>

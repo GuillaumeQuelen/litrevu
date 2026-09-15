@@ -178,3 +178,110 @@ ul {
     border-left: 3px solid var(--accent);
     margin-bottom: 1.5rem;
 }
+
+.accueil {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-top: 2rem;
+}
+
+.accueil h1 {
+    font-size: 1.5rem;
+}
+
+.accueil h2 {
+    font-size: 1.5rem;
+    margin-top: 0;
+}
+
+.bouton {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.bouton:hover {
+    opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+    .accueil {
+        grid-template-columns: 1fr;
+    }
+}
+.actions-principales {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.ticket-bloc {
+    border: 1px solid var(--bordure);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-top: 1rem;
+    background: var(--doux);
+}
+
+.ticket-bloc h3 {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+}
+
+.date {
+    float: right;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.etoiles {
+    color: var(--accent);
+    letter-spacing: 0.1em;
+}
+
+.couverture {
+    max-width: 150px;
+    height: auto;
+    margin-top: 0.5rem;
+}
+
+.align-droite {
+    justify-content: flex-end;
+}
+
+.bouton-petit {
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--bordure);
+    border-radius: 3px;
+    text-decoration: none;
+    color: var(--texte);
+}
+
+.bouton-petit:hover {
+    background: var(--doux);
+}
+
+.liste-utilisateurs {
+    list-style: none;
+    padding: 0;
+}
+
+.liste-utilisateurs li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.actions-utilisateur {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+}

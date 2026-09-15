@@ -1,22 +1,65 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import Ticket, Review, UserFollows
-from django.db.models import Q
 from itertools import chain
-from .forms import TicketForm, ReviewForm, FollowUserForm
-from django.contrib.auth import get_user_model
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.db.models import CharField, Q, Value
+from django.shortcuts import get_object_or_404, redirect, render
+from .forms import FollowUserForm, ReviewForm, TicketForm
+from .models import Review, Ticket, UserBlocks, UserFollows
 User = get_user_model()
+
 
 @login_required
 def flux(request):
     suivis = request.user.following.values_list('followed_user', flat=True)
-    tickets = Ticket.objects.filter(Q(user=request.user) | Q(user__in=suivis))
-    reviews = Review.objects.filter(Q(user=request.user) | Q(user__in=suivis))
-    flux_items = sorted(chain(tickets, reviews), key=lambda x: x.time_created, reverse=True)
-    return render(request, 'reviews/flux.html', {'Flux': flux_items})
+    bloques = request.user.blocking.values_list('blocked_user', flat=True)
+    bloquants = request.user.blocked_by.values_list('user', flat=True)
 
-from .forms import TicketForm
+    tickets = Ticket.objects.filter(
+        Q(user=request.user) | Q(user__in=suivis)
+    ).exclude(
+        Q(user__in=bloques) | Q(user__in=bloquants)
+    ).annotate(content_type=Value('TICKET', CharField()))
+
+    reviews = Review.objects.filter(
+        Q(user=request.user)
+        | Q(user__in=suivis)
+        | Q(ticket__user=request.user)
+    ).exclude(
+        Q(user__in=bloques) | Q(user__in=bloquants)
+    ).annotate(content_type=Value('REVIEW', CharField()))
+
+    posts = sorted(
+        chain(tickets, reviews),
+        key=lambda post: post.time_created,
+        reverse=True
+    )
+    tickets_critiques = Review.objects.filter(
+        user=request.user
+    ).values_list('ticket_id', flat=True)
+
+    return render(request, 'reviews/flux.html', {
+        'posts': posts,
+        'tickets_critiques': tickets_critiques,
+    })
+
+
+@login_required
+def my_posts(request):
+    tickets = Ticket.objects.filter(user=request.user).annotate(
+        content_type=Value('TICKET', CharField())
+    )
+    reviews = Review.objects.filter(user=request.user).annotate(
+        content_type=Value('REVIEW', CharField())
+    )
+
+    posts = sorted(
+        chain(tickets, reviews),
+        key=lambda post: post.time_created,
+        reverse=True
+    )
+
+    return render(request, 'reviews/my_posts.html', {'posts': posts})
 
 
 @login_required
@@ -32,6 +75,7 @@ def create_ticket(request):
             return redirect('flux')
 
     return render(request, 'reviews/create_ticket.html', {'form': form})
+
 
 @login_required
 def update_ticket(request, ticket_id):
@@ -50,6 +94,7 @@ def update_ticket(request, ticket_id):
 
     return render(request, 'reviews/update_ticket.html', {'form': form, 'ticket': ticket})
 
+
 @login_required
 def delete_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
@@ -63,9 +108,14 @@ def delete_ticket(request, ticket_id):
 
     return render(request, 'reviews/delete_ticket.html', {'ticket': ticket})
 
+
 @login_required
 def create_review(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    if Review.objects.filter(ticket=ticket, user=request.user).exists():
+        return redirect('flux')
+
     form = ReviewForm()
 
     if request.method == 'POST':
@@ -78,6 +128,7 @@ def create_review(request, ticket_id):
             return redirect('flux')
 
     return render(request, 'reviews/create_review.html', {'form': form, 'ticket': ticket})
+
 
 @login_required
 def update_review(request, review_id):
@@ -96,6 +147,7 @@ def update_review(request, review_id):
 
     return render(request, 'reviews/update_review.html', {'form': form, 'review': review})
 
+
 @login_required
 def delete_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)
@@ -108,51 +160,6 @@ def delete_review(request, review_id):
         return redirect('flux')
 
     return render(request, 'reviews/delete_review.html', {'review': review})
-
-@login_required
-def follow_users(request):
-    form = FollowUserForm()
-    message = ''
-
-    if request.method == 'POST':
-        form = FollowUserForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            try:
-                user_to_follow = User.objects.get(username=username)
-            except User.DoesNotExist:
-                message = "Cet utilisateur n'existe pas."
-            else:
-                if user_to_follow == request.user:
-                    message = "Vous ne pouvez pas vous suivre vous-même."
-                elif UserFollows.objects.filter(user=request.user, followed_user=user_to_follow).exists():
-                    message = "Vous suivez déjà cet utilisateur."
-                else:
-                    UserFollows.objects.create(user=request.user, followed_user=user_to_follow)
-                    return redirect('follow_users')
-
-    following = UserFollows.objects.filter(user=request.user)
-    followers = UserFollows.objects.filter(followed_user=request.user)
-
-    return render(request, 'reviews/follow_users.html', {
-        'form': form,
-        'message': message,
-        'following': following,
-        'followers': followers,
-    })
-
-@login_required
-def unfollow_user(request, follow_id):
-    follow = get_object_or_404(UserFollows, id=follow_id)
-
-    if follow.user != request.user:
-        return redirect('follow_users')
-
-    if request.method == 'POST':
-        follow.delete()
-        return redirect('follow_users')
-
-    return render(request, 'reviews/unfollow_user.html', {'follow': follow})
 
 
 @login_required
@@ -181,15 +188,94 @@ def create_ticket_and_review(request):
         'review_form': review_form,
     })
 
+
 @login_required
-def my_posts(request):
-    tickets = Ticket.objects.filter(user=request.user)
-    reviews = Review.objects.filter(user=request.user)
+def follow_users(request):
+    form = FollowUserForm()
+    message = ''
 
-    posts = sorted(
-        chain(tickets, reviews),
-        key=lambda x: x.time_created,
-        reverse=True
-    )
+    if request.method == 'POST':
+        form = FollowUserForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            try:
+                user_to_follow = User.objects.get(username=username)
+            except User.DoesNotExist:
+                message = "Cet utilisateur n'existe pas."
+            else:
+                if user_to_follow == request.user:
+                    message = "Vous ne pouvez pas vous suivre vous-même."
+                elif UserBlocks.objects.filter(
+                    Q(user=request.user, blocked_user=user_to_follow)
+                    | Q(user=user_to_follow, blocked_user=request.user)
+                ).exists():
+                    message = "Impossible de suivre cet utilisateur."
+                elif UserFollows.objects.filter(
+                    user=request.user, followed_user=user_to_follow
+                ).exists():
+                    message = "Vous suivez déjà cet utilisateur."
+                else:
+                    UserFollows.objects.create(
+                        user=request.user, followed_user=user_to_follow
+                    )
+                    return redirect('follow_users')
 
-    return render(request, 'reviews/my_posts.html', {'posts': posts})
+    following = UserFollows.objects.filter(user=request.user)
+    followers = UserFollows.objects.filter(followed_user=request.user)
+    blocks = UserBlocks.objects.filter(user=request.user)
+    
+    return render(request, 'reviews/follow_users.html', {
+        'form': form,
+        'message': message,
+        'following': following,
+        'followers': followers,
+        'blocks': blocks,
+    })
+
+@login_required
+def unfollow_user(request, follow_id):
+    follow = get_object_or_404(UserFollows, id=follow_id)
+
+    if follow.user != request.user:
+        return redirect('follow_users')
+
+    if request.method == 'POST':
+        follow.delete()
+        return redirect('follow_users')
+
+    return render(request, 'reviews/unfollow_user.html', {'follow': follow})
+
+@login_required
+def block_user(request, user_id):
+    user_to_block = get_object_or_404(User, id=user_id)
+
+    if user_to_block == request.user:
+        return redirect('follow_users')
+
+    if request.method == 'POST':
+        UserFollows.objects.filter(
+            user=request.user, followed_user=user_to_block
+        ).delete()
+        UserFollows.objects.filter(
+            user=user_to_block, followed_user=request.user
+        ).delete()
+
+        UserBlocks.objects.get_or_create(
+            user=request.user, blocked_user=user_to_block
+        )
+        return redirect('follow_users')
+
+    return render(request, 'reviews/block_user.html', {'user_to_block': user_to_block})
+
+@login_required
+def unblock_user(request, block_id):
+    block = get_object_or_404(UserBlocks, id=block_id)
+
+    if block.user != request.user:
+        return redirect('follow_users')
+
+    if request.method == 'POST':
+        block.delete()
+        return redirect('follow_users')
+
+    return render(request, 'reviews/unblock_user.html', {'block': block})

@@ -1,0 +1,17 @@
+<div class="ticket-bloc">
+    <p class="post-meta">
+        {% if ticket.user == user %}Vous avez{% else %}{{ ticket.user.username }} a{% endif %}
+        demandé une critique
+        <span class="date">{{ ticket.time_created|date:"H:i, j F Y" }}</span>
+    </p>
+
+    <h3>{{ ticket.title }}</h3>
+
+    {% if ticket.description %}
+        <p>{{ ticket.description }}</p>
+    {% endif %}
+
+    {% if ticket.image %}
+        <img src="{{ ticket.image.url }}" alt="Couverture de {{ ticket.title }}" class="couverture">
+    {% endif %}
+</div>

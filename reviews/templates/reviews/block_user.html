@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Bloquer{% endblock %}
+
+{% block content %}
+    <h1>Bloquer {{ user_to_block.username }} ?</h1>
+
+    <p>
+        Vous ne verrez plus son contenu, et vos abonnements mutuels seront supprimés.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirmer le blocage</button>
+    </form>
+
+    <a href="{% url 'follow_users' %}">Annuler</a>
+{% endblock %}

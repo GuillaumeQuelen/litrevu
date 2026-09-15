@@ -3,28 +3,21 @@
 {% block title %}Mes posts{% endblock %}
 
 {% block content %}
-    <h1>Mes posts</h1>
+    <h1>Vos posts</h1>
 
-    {% for item in posts %}
+    {% for post in posts %}
         <article class="post">
-            {% if item.rating %}
-                <span class="post-type">Critique</span>
-                <p class="post-meta">{{ item.time_created|date:"d/m/Y à H:i" }}</p>
-                <h2>{{ item.headline }}</h2>
-                <p>Note : {{ item.rating }}/5</p>
-                {% if item.body %}<p>{{ item.body }}</p>{% endif %}
-                <div class="post-actions">
-                    <a href="{% url 'update_review' item.id %}">Modifier</a>
-                    <a href="{% url 'delete_review' item.id %}">Supprimer</a>
+            {% if post.content_type == 'TICKET' %}
+                {% include 'reviews/ticket_snippet.html' with ticket=post %}
+                <div class="post-actions align-droite">
+                    <a href="{% url 'update_ticket' post.id %}" class="bouton-petit">Modifier</a>
+                    <a href="{% url 'delete_ticket' post.id %}" class="bouton-petit">Supprimer</a>
                 </div>
-            {% else %}
-                <span class="post-type">Demande</span>
-                <p class="post-meta">{{ item.time_created|date:"d/m/Y à H:i" }}</p>
-                <h2>{{ item.title }}</h2>
-                {% if item.description %}<p>{{ item.description }}</p>{% endif %}
-                <div class="post-actions">
-                    <a href="{% url 'update_ticket' item.id %}">Modifier</a>
-                    <a href="{% url 'delete_ticket' item.id %}">Supprimer</a>
+            {% elif post.content_type == 'REVIEW' %}
+                {% include 'reviews/review_snippet.html' with review=post %}
+                <div class="post-actions align-droite">
+                    <a href="{% url 'update_review' post.id %}" class="bouton-petit">Modifier</a>
+                    <a href="{% url 'delete_review' post.id %}" class="bouton-petit">Supprimer</a>
                 </div>
             {% endif %}
         </article>

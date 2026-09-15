@@ -16,11 +16,14 @@
     </form>
 
     <h2>Vous suivez</h2>
-    <ul>
+    <ul class="liste-utilisateurs">
         {% for follow in following %}
             <li>
                 {{ follow.followed_user.username }}
-                <a href="{% url 'unfollow_user' follow.id %}">Se désabonner</a>
+                <span class="actions-utilisateur">
+                    <a href="{% url 'unfollow_user' follow.id %}">Se désabonner</a>
+                    <a href="{% url 'block_user' follow.followed_user.id %}">Bloquer</a>
+                </span>
             </li>
         {% empty %}
             <li>Vous ne suivez personne.</li>
@@ -28,11 +31,30 @@
     </ul>
 
     <h2>Vos abonnés</h2>
-    <ul>
+    <ul class="liste-utilisateurs">
         {% for follow in followers %}
-            <li>{{ follow.user.username }}</li>
+            <li>
+                {{ follow.user.username }}
+                <span class="actions-utilisateur">
+                    <a href="{% url 'block_user' follow.user.id %}">Bloquer</a>
+                </span>
+            </li>
         {% empty %}
             <li>Personne ne vous suit.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Utilisateurs bloqués</h2>
+    <ul class="liste-utilisateurs">
+        {% for block in blocks %}
+            <li>
+                {{ block.blocked_user.username }}
+                <span class="actions-utilisateur">
+                    <a href="{% url 'unblock_user' block.id %}">Débloquer</a>
+                </span>
+            </li>
+        {% empty %}
+            <li>Vous n'avez bloqué personne.</li>
         {% endfor %}
     </ul>
 {% endblock %}

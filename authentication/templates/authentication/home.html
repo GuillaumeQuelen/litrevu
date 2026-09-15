@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+    <div class="accueil">
+        <section class="accueil-inscription">
+            <h1>Inscrivez-vous maintenant</h1>
+            <p>Rejoignez la communauté et partagez vos lectures.</p>
+            <a href="{% url 'signup' %}" class="bouton">S'inscrire</a>
+        </section>
+
+        <section class="accueil-connexion">
+            <h2>Connectez-vous</h2>
+
+            {% if message %}
+                <p class="message" role="alert">{{ message }}</p>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                {% if request.GET.next %}
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
+                {% endif %}
+                <button type="submit">Se connecter</button>
+            </form>
+        </section>
+    </div>
+{% endblock %}

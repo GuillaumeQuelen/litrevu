@@ -26,8 +26,6 @@ class Review(models.Model):
 
     def __str__(self):
         return self.headline
-    
-
 
 class UserFollows(models.Model):
     user = models.ForeignKey(
@@ -42,3 +40,17 @@ class UserFollows(models.Model):
 
     def __str__(self):
         return f'{self.user} suit {self.followed_user}'
+
+class UserBlocks(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='blocking'
+    )
+    blocked_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='blocked_by'
+    )
+
+    class Meta:
+        unique_together = ('user', 'blocked_user')
+
+    def __str__(self):
+        return f'{self.user} bloque {self.blocked_user}'

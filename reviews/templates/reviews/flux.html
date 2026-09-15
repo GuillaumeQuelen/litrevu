@@ -3,50 +3,32 @@
 {% block title %}Flux{% endblock %}
 
 {% block content %}
-    <h1>Mon flux</h1>
+    <div class="actions-principales">
+        <a href="{% url 'create_ticket' %}" class="bouton">Demander une critique</a>
+        <a href="{% url 'create_ticket_and_review' %}" class="bouton">Créer une critique</a>
+    </div>
 
-    {% for item in Flux %}
+    {% for post in posts %}
         <article class="post">
-            {% if item.rating %}
-                <span class="post-type">Critique</span>
-                <p class="post-meta">
-                    Par {{ item.user.username }}, le {{ item.time_created|date:"d/m/Y à H:i" }}
-                </p>
-                <h2>{{ item.headline }}</h2>
-                <p>Note : {{ item.rating }}/5</p>
-                {% if item.body %}
-                    <p>{{ item.body }}</p>
-                {% endif %}
-                {% if item.ticket %}
-                    <p class="post-meta">En réponse à : {{ item.ticket.title }}</p>
-                {% endif %}
-
-                {% if item.user == user %}
-                    <div class="post-actions">
-                        <a href="{% url 'update_review' item.id %}">Modifier</a>
-                        <a href="{% url 'delete_review' item.id %}">Supprimer</a>
-                    </div>
-                {% endif %}
-            {% else %}
-                <span class="post-type">Demande</span>
-                <p class="post-meta">
-                    Par {{ item.user.username }}, le {{ item.time_created|date:"d/m/Y à H:i" }}
-                </p>
-                <h2>{{ item.title }}</h2>
-                {% if item.description %}
-                    <p>{{ item.description }}</p>
-                {% endif %}
-                {% if item.image %}
-                    <img src="{{ item.image.url }}" alt="Couverture de {{ item.title }}" width="150">
-                {% endif %}
-
+            {% if post.content_type == 'TICKET' %}
+                {% include 'reviews/ticket_snippet.html' with ticket=post %}
                 <div class="post-actions">
-                    <a href="{% url 'create_review' item.id %}">Critiquer</a>
-                    {% if item.user == user %}
-                        <a href="{% url 'update_ticket' item.id %}">Modifier</a>
-                        <a href="{% url 'delete_ticket' item.id %}">Supprimer</a>
+                    {% if post.id not in tickets_critiques %}
+                        <a href="{% url 'create_review' post.id %}" class="bouton-petit">Créer une critique</a>
+                    {% endif %}
+                    {% if post.user == user %}
+                        <a href="{% url 'update_ticket' post.id %}" class="bouton-petit">Modifier</a>
+                        <a href="{% url 'delete_ticket' post.id %}" class="bouton-petit">Supprimer</a>
                     {% endif %}
                 </div>
+            {% elif post.content_type == 'REVIEW' %}
+                {% include 'reviews/review_snippet.html' with review=post %}
+                {% if post.user == user %}
+                    <div class="post-actions">
+                        <a href="{% url 'update_review' post.id %}" class="bouton-petit">Modifier</a>
+                        <a href="{% url 'delete_review' post.id %}" class="bouton-petit">Supprimer</a>
+                    </div>
+                {% endif %}
             {% endif %}
         </article>
     {% empty %}
