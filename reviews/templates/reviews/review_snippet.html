@@ -1,20 +1,45 @@
-<p class="post-meta">
-    {% if review.user == user %}Vous avez{% else %}{{ review.user.username }} a{% endif %}
-    publié une critique
-    <span class="date">{{ review.time_created|date:"H:i, j F Y" }}</span>
-</p>
+<div class="critique">
+    <div class="livre">
+        {% if review.ticket.image %}
+            <img src="{{ review.ticket.image.url }}" alt="Couverture de {{ review.ticket.title }}" class="livre-couverture">
+        {% else %}
+            <span class="livre-titre">{{ review.ticket.title }}</span>
+        {% endif %}
+    </div>
 
-<h2>
-    {{ review.headline }}
-    <span class="etoiles" aria-label="Note : {{ review.rating }} sur 5">
-        {% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}
-    </span>
-</h2>
+    <details class="lettre">
+        <summary class="lettre-entete">
+            <span class="lettre-destinataire">
+                {% if review.ticket.user == review.user %}
+                    Chronique libre
+                {% else %}
+                    {% if review.ticket.user == user %}Vous{% else %}{{ review.ticket.user.username }}{% endif %}
+                {% endif %}
+            </span>
+            <span class="lettre-titre">{{ review.headline }}</span>
+            <span class="etoiles" aria-label="Note : {{ review.rating }} sur 5">
+                {% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}
+            </span>
+            <span class="cachet">Lire</span>
+        </summary>
 
-{% if review.body %}
-    <p>{{ review.body }}</p>
-{% endif %}
+        <div class="lettre-corps">
+            {% if review.ticket.description %}
+                {% if review.ticket.description %}
+                    {% if review.ticket.user == review.user %}
+                        <p class="lettre-demande">À propos de ce livre : {{ review.ticket.description }}</p>
+                    {% else %}
+                        <p class="lettre-demande">Ta demande : {{ review.ticket.description }}</p>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
 
-{% if review.ticket %}
-    {% include 'reviews/ticket_snippet.html' with ticket=review.ticket %}
-{% endif %}
+            <div class="lettre-texte">{{ review.body|linebreaks }}</div>
+
+            <p class="lettre-signature {% if review.user == user %}signature-moi{% endif %}">
+                {% if review.user == user %}Vous{% else %}{{ review.user.username }}{% endif %},
+                le {{ review.time_created|date:"j F Y" }}
+            </p>
+        </div>
+    </details>
+</div>

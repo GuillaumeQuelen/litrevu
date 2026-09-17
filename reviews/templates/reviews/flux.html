@@ -1,27 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Flux{% endblock %}
+{% block title %}Mon fil{% endblock %}
 
 {% block content %}
-    <div class="actions-principales">
-        <a href="{% url 'create_ticket' %}" class="bouton">Demander une critique</a>
-        <a href="{% url 'create_ticket_and_review' %}" class="bouton">Créer une critique</a>
-    </div>
-
     {% for post in posts %}
-        <article class="post">
-            {% if post.content_type == 'TICKET' %}
-                {% include 'reviews/ticket_snippet.html' with ticket=post %}
+        {% if post.content_type == 'TICKET' %}
+            <article class="post-demande">
+                {% include 'reviews/ticket_snippet.html' with ticket=post couleur=forloop.counter0 %}
                 <div class="post-actions">
                     {% if post.id not in tickets_critiques %}
-                        <a href="{% url 'create_review' post.id %}" class="bouton-petit">Créer une critique</a>
+                        <a href="{% url 'create_review' post.id %}" class="bouton-petit">Chroniquer une lecture</a>
                     {% endif %}
                     {% if post.user == user %}
                         <a href="{% url 'update_ticket' post.id %}" class="bouton-petit">Modifier</a>
                         <a href="{% url 'delete_ticket' post.id %}" class="bouton-petit">Supprimer</a>
                     {% endif %}
                 </div>
-            {% elif post.content_type == 'REVIEW' %}
+            </article>
+        {% elif post.content_type == 'REVIEW' %}
+            <article class="post">
                 {% include 'reviews/review_snippet.html' with review=post %}
                 {% if post.user == user %}
                     <div class="post-actions">
@@ -29,8 +26,8 @@
                         <a href="{% url 'delete_review' post.id %}" class="bouton-petit">Supprimer</a>
                     </div>
                 {% endif %}
-            {% endif %}
-        </article>
+            </article>
+        {% endif %}
     {% empty %}
         <p>Votre flux est vide. Suivez des utilisateurs ou publiez quelque chose.</p>
     {% endfor %}

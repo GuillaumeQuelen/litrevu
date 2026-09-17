@@ -135,4 +135,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 LOGIN_URL = '/'
-LOGIN_REDIRECT_URL = '/flux/'
+LOGIN_REDIRECT_URL = '/le_fil/'

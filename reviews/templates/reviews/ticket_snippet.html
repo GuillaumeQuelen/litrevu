@@ -1,17 +1,21 @@
-<div class="ticket-bloc">
-    <p class="post-meta">
-        {% if ticket.user == user %}Vous avez{% else %}{{ ticket.user.username }} a{% endif %}
-        demandé une critique
-        <span class="date">{{ ticket.time_created|date:"H:i, j F Y" }}</span>
-    </p>
+<div class="demande">
+    <div class="livre livre-couleur-{% cycle '1' '2' '3' '4' %}">
+        {% if ticket.image %}
+            <img src="{{ ticket.image.url }}" alt="Couverture de {{ ticket.title }}" class="livre-couverture">
+        {% else %}
+            <span class="livre-titre">{{ ticket.title }}</span>
+        {% endif %}
+    </div>
 
-    <h3>{{ ticket.title }}</h3>
+    <div class="post-it">
+        <h3>{{ ticket.title }}</h3>
 
-    {% if ticket.description %}
-        <p>{{ ticket.description }}</p>
-    {% endif %}
+        {% if ticket.description %}
+            <div class="post-it-texte">{{ ticket.description|linebreaks }}</div>
+        {% endif %}
 
-    {% if ticket.image %}
-        <img src="{{ ticket.image.url }}" alt="Couverture de {{ ticket.title }}" class="couverture">
-    {% endif %}
+        <p class="post-it-signature {% if ticket.user == user %}signature-moi{% endif %}">
+            {% if ticket.user == user %}Vous{% else %}{{ ticket.user.username }}{% endif %}
+        </p>
+    </div>
 </div>

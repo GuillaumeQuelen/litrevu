@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('flux/', views.flux, name='flux'),
+    path('le_fil/', views.flux, name='flux'),
     path('ticket/create/', views.create_ticket, name='create_ticket'),
     path('ticket/<int:ticket_id>/update/', views.update_ticket, name='update_ticket'),
     path('ticket/<int:ticket_id>/delete/', views.delete_ticket, name='delete_ticket'),

@@ -13,25 +13,35 @@
 
         {% if user.is_authenticated %}
             <nav aria-label="Navigation principale">
-                <ul>
-                    <li><a href="{% url 'flux' %}">Flux</a></li>
-                    <li><a href="{% url 'my_posts' %}">Mes posts</a></li>
-                    <li><a href="{% url 'follow_users' %}">Abonnements</a></li>
-                    <li><a href="{% url 'create_ticket' %}">Demander une critique</a></li>
-                    <li><a href="{% url 'create_ticket_and_review' %}">Publier une critique</a></li>
+                <ul class="pile">
+                    <li><a href="{% url 'flux' %}" class="livre-plat livre-1">Mon fil</a></li>
+                    <li><a href="{% url 'my_posts' %}" class="livre-plat livre-2">Mes correspondances</a></li>
+                    <li><a href="{% url 'follow_users' %}" class="livre-plat livre-3">Mes cercles</a></li>
+                </ul>
+
+                <ul class="courrier">
+                    <li>
+                        <a href="{% url 'create_ticket' %}" class="page">
+                            <span class="page-titre">Solliciter</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'create_ticket_and_review' %}" class="page">
+                            <span class="page-titre">Chroniquer</span>
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="user-menu">
-                    <span>{{ user.username }}</span>
+                    <span class="livre-plat livre-user">{{ user.username }}</span>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button type="submit">Déconnexion</button>
+                        <button type="submit" class="interrupteur">Sortir</button>
                     </form>
                 </div>
             </nav>
         {% endif %}
     </header>
-
     <main>
         {% block content %}{% endblock %}
     </main>
